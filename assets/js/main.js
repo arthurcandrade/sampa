@@ -33,11 +33,17 @@ function formatProcesso(processo) {
 function formatDate(dateString) {
     if (!dateString) return 'N/A';
     const date = new Date(dateString);
-    if (isNaN(date)) return 'Data inválida';
+    if (isNaN(date)) return dateString; // Return original string if invalid
     const day = String(date.getDate()).padStart(2, '0');
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const year = date.getFullYear();
     return `${day}/${month}/${year}`;
+}
+
+function formatCurrency(value) {
+    const num = parseFloat(value);
+    if (isNaN(num)) return value;
+    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(num);
 }
 
 function getStatusClass(status) {
@@ -60,6 +66,11 @@ function getStatusClass(status) {
         default:
             return 'status-default';
     }
+}
+
+function isCurrency(key) {
+    const lowerKey = key.toLowerCase();
+    return lowerKey.includes('valor') || lowerKey.includes('investimento') || lowerKey.includes('estimativa') || lowerKey.includes('empenhado') || lowerKey.includes('custeio');
 }
 
 function renderBoard(data) {
@@ -94,13 +105,35 @@ function renderBoard(data) {
             const cardEl = document.createElement('div');
             cardEl.className = 'kanban-card';
 
-            const processoFormatado = formatProcesso(item["Processo Administrativo"]);
+            const processoOriginal = item["Processo Administrativo"];
+            const processoFormatado = formatProcesso(processoOriginal);
+            const processoUrl = `https://proad-v2.tjgo.jus.br/proad/processo/cadastro?id=${processoOriginal}`;
+
             const dataFormatada = formatDate(item["Data Contrato"]);
             const statusClass = getStatusClass(item["Status"]);
+            const duracao = item["Duração (dias)"] ? `${item["Duração (dias)"]} dias` : '';
+
+            // Create details list
+            const excludedKeys = ["Processo Administrativo", "Andamento - Objeto resumido", "Data Contrato", "Status", "Duração (dias)", "Fase Atual"];
+            let detailsHtml = '';
+            for (const key in item) {
+                if (!excludedKeys.includes(key) && item[key]) {
+                    let value = item[key];
+                    if (key.toLowerCase().includes('data')) {
+                        value = formatDate(value);
+                    } else if (isCurrency(key)) {
+                        value = formatCurrency(value);
+                    }
+                    detailsHtml += `<div class="detail-item"><span class="detail-key">${key}</span><span class="detail-value">${value}</span></div>`;
+                }
+            }
 
             cardEl.innerHTML = `
                 <div class="kanban-card-header">
-                    <strong>${processoFormatado}</strong>
+                    <a href="${processoUrl}" target="_blank">
+                        <strong>${processoFormatado}</strong>
+                    </a>
+                    ${duracao ? `<span class="duration-badge">${duracao}</span>` : ''}
                 </div>
                 <div class="kanban-card-body">
                     ${item["Andamento - Objeto resumido"]}
@@ -109,12 +142,31 @@ function renderBoard(data) {
                     <span>${dataFormatada}</span>
                     <span class="status-badge ${statusClass}">${item["Status"]}</span>
                 </div>
+                <div class="kanban-card-details">${detailsHtml}</div>
+                <div class="expand-btn">Ver mais</div>
             `;
             columnEl.appendChild(cardEl);
         });
 
         kanbanBoard.appendChild(columnEl);
     }
+    addExpandListeners();
+}
+
+function addExpandListeners() {
+    const expandBtns = document.querySelectorAll('.expand-btn');
+    expandBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const details = btn.previousElementSibling;
+            if (details.style.display === 'grid') {
+                details.style.display = 'none';
+                btn.textContent = 'Ver mais';
+            } else {
+                details.style.display = 'grid';
+                btn.textContent = 'Ver menos';
+            }
+        });
+    });
 }
 
 // Initial fetch

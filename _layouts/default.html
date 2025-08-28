@@ -85,11 +85,29 @@
             padding: 0.75rem 1rem;
             border-bottom: 1px solid #eaf0f6;
             background-color: #f8f9f9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .kanban-card-header a {
+            text-decoration: none;
+        }
+        .kanban-card-header a:hover strong {
+            color: #3498db;
         }
         .kanban-card-header strong {
             font-weight: 700;
             color: #2c3e50;
             font-size: 1.4rem;
+            transition: color 0.2s ease-in-out;
+        }
+        .duration-badge {
+            background-color: #e9ecef;
+            color: #495057;
+            padding: 0.2rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.8rem;
+            font-weight: 500;
         }
         .kanban-card-body {
             padding: 1rem;
@@ -124,6 +142,37 @@
         .status-fracassado { background-color: #c0392b; } /* Red */
         .status-suspenso { background-color: #8e44ad; } /* Purple */
         .status-default { background-color: #bdc3c7; }
+        .kanban-card-details {
+            display: none; /* Initially hidden */
+            grid-template-columns: 40% 60%;
+            gap: 0.5rem 1rem;
+            padding: 1rem;
+            background-color: #f8f9fa;
+            border-top: 1px solid #eaf0f6;
+        }
+        .detail-item {
+            display: contents; /* Allows the children to be direct grid items */
+        }
+        .detail-key {
+            font-weight: 500;
+            color: #34495e;
+            text-align: left;
+        }
+        .detail-value {
+            color: #566573;
+        }
+        .expand-btn {
+            cursor: pointer;
+            text-align: center;
+            padding: 0.25rem;
+            background-color: #f1f3f5;
+            border-top: 1px solid #eaf0f6;
+            font-size: 0.8rem;
+            color: #495057;
+        }
+        .expand-btn:hover {
+            background-color: #e9ecef;
+        }
     </style>
 </head>
 <body>
