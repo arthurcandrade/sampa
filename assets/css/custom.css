@@ -143,7 +143,7 @@ body {
     letter-spacing: 0.5px;
 }
 /* Status colors */
-.status-concluida, .status-contratado { background-color: #27ae60; } /* Green */
+.status-concluída { background-color: #27ae60; } /* Green */
 .status-em-andamento { background-color: #2980b9; } /* Blue */
 .status-default { background-color: #bdc3c7; }
 .kanban-card-details {

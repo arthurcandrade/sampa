@@ -50,16 +50,7 @@ function formatCurrency(value) {
 
 function getStatusClass(status) {
     if (!status) return 'status-default';
-    const normalizedStatus = status.toLowerCase().replace(/\s+/g, '-');
-    switch (normalizedStatus) {
-        case 'concluída':
-        case 'contratado':
-            return 'status-contratado';
-        case 'em-andamento':
-            return 'status-em-andamento';
-        default:
-            return 'status-default';
-    }
+    return `status-${status.toLowerCase().replace(/\s+/g, '-')}`;
 }
 
 function isCurrency(key) {
@@ -68,6 +59,8 @@ function isCurrency(key) {
 }
 
 function renderBoard(data) {
+    // Use a DocumentFragment to build the board in memory, avoiding multiple DOM updates.
+    const fragment = document.createDocumentFragment();
     // Clear existing columns data
     for (const column in columns) {
         columns[column] = [];
@@ -82,8 +75,27 @@ function renderBoard(data) {
         });
     }
 
-    // Clear the board
-    kanbanBoard.innerHTML = '';
+    // Sort cards within each column by process number
+    for (const columnName in columns) {
+        columns[columnName].sort((a, b) => {
+            const getFirstSanitizedProcessNumber = (item) => {
+                const processoOriginal = item["Processo Administrativo"];
+                if (!processoOriginal) return Infinity; // Itens sem processo vão para o final
+
+                const firstPart = String(processoOriginal).trim().split(/\s+/)[0];
+                const sanitized = formatProcesso(firstPart);
+
+                // Converte para número para garantir a ordenação numérica correta
+                const num = parseInt(sanitized, 10);
+                return isNaN(num) ? Infinity : num;
+            };
+
+            const numA = getFirstSanitizedProcessNumber(a);
+            const numB = getFirstSanitizedProcessNumber(b);
+
+            return numA - numB;
+        });
+    }
 
     // Render columns and cards
     for (const columnName in columns) {
@@ -100,8 +112,6 @@ function renderBoard(data) {
             cardEl.className = 'kanban-card';
 
             const processoOriginal = item["Processo Administrativo"];
-            // Handle multiple processo values: sanitize each (remove first 6 chars + leading zeros)
-            // and create a link for each one using the sanitized number in the id parameter.
             let sanitizedParts = [];
             let processoLinksHtml = '';
             if (processoOriginal) {
@@ -116,6 +126,14 @@ function renderBoard(data) {
             const dataFormatada = formatDate(item["Data Contrato"]);
             const statusClass = getStatusClass(item["Status"]);
             const duracao = item["Duração (dias)"] && item["Duração (dias)"] >= 0 ? `${item["Duração (dias)"]} dias` : '';
+
+            const expandedKey = item['Item no Plano de Contratações'] || (sanitizedParts.length ? sanitizedParts.join(' / ') : processoOriginal) || '';
+            if (expandedKey) {
+                cardEl.dataset.expandedKey = expandedKey;
+            }
+            const isExpanded = expandedKey ? localStorage.getItem('expanded::' + expandedKey) === 'true' : false;
+            const detailsDisplayStyle = isExpanded ? 'grid' : 'none';
+            const buttonText = isExpanded ? 'Ver menos' : 'Ver mais';
 
             // Create details list
             const excludedKeys = ["Processo Administrativo", "Andamento - Objeto resumido", "Data Contrato", "Status", "Duração (dias)", "Fase Atual"];
@@ -144,62 +162,39 @@ function renderBoard(data) {
                     <span>${dataFormatada}</span>
                     <span class="status-badge ${statusClass}">${item["Status"]}</span>
                 </div>
-                <div class="kanban-card-details">${detailsHtml}</div>
-                <div class="expand-btn">Ver mais</div>
+                <div class="kanban-card-details" style="display: ${detailsDisplayStyle};">${detailsHtml}</div>
+                <div class="expand-btn">${buttonText}</div>
             `;
-            const expandedKey = item['Item no Plano de Contratações'] || (sanitizedParts && sanitizedParts.length ? sanitizedParts.join(' / ') : processoOriginal) || '';
-            if (expandedKey) cardEl.dataset.expandedKey = expandedKey;
             columnEl.appendChild(cardEl);
         });
 
-        kanbanBoard.appendChild(columnEl);
+        fragment.appendChild(columnEl);
     }
-    restoreExpandState();
-    addExpandListeners();
+
+    // Perform a single, efficient DOM update.
+    kanbanBoard.innerHTML = '';
+    kanbanBoard.appendChild(fragment);
 }
 
-function addExpandListeners() {
-    const expandBtns = document.querySelectorAll('.expand-btn');
-    expandBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            const details = btn.previousElementSibling;
-            const card = btn.closest('.kanban-card');
-            const key = card ? card.dataset.expandedKey : null;
-            if (details.style.display === 'grid') {
-                details.style.display = 'none';
-                btn.textContent = 'Ver mais';
-                if (key) localStorage.setItem('expanded::' + key, 'false');
-            } else {
-                details.style.display = 'grid';
-                btn.textContent = 'Ver menos';
-                if (key) localStorage.setItem('expanded::' + key, 'true');
-            }
-        });
-    });
-}
+function setupEventListeners() {
+    kanbanBoard.addEventListener('click', (event) => {
+        const expandBtn = event.target.closest('.expand-btn');
+        if (!expandBtn) return; // Click was not on an expand button
 
-// Persist expand/collapse state using localStorage
-function restoreExpandState() {
-    const cards = document.querySelectorAll('.kanban-card');
-    cards.forEach(card => {
-        const key = card.dataset.expandedKey;
-        const details = card.querySelector('.kanban-card-details');
-        const btn = card.querySelector('.expand-btn');
-        if (!key || !details || !btn) return;
-        const saved = localStorage.getItem('expanded::' + key);
-        if (saved === 'true') {
-            details.style.display = 'grid';
-            btn.textContent = 'Ver menos';
-        } else {
-            details.style.display = 'none';
-            btn.textContent = 'Ver mais';
+        const details = expandBtn.previousElementSibling;
+        const card = expandBtn.closest('.kanban-card');
+        const key = card ? card.dataset.expandedKey : null;
+
+        const isVisible = details.style.display === 'grid';
+        details.style.display = isVisible ? 'none' : 'grid';
+        expandBtn.textContent = isVisible ? 'Ver mais' : 'Ver menos';
+
+        if (key) {
+            localStorage.setItem('expanded::' + key, !isVisible);
         }
-    // Do not attach click handler here to avoid duplicates; addExpandListeners will manage persistence
     });
 }
 
-// Initial fetch
+setupEventListeners();
 fetchData();
-
-// Fetch data every 30 seconds
 setInterval(fetchData, 30000);
