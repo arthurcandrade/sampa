@@ -33,7 +33,7 @@ function formatProcesso(processo) {
 }
 
 function formatDate(dateString) {
-    if (!dateString) return 'N/A';
+    if (!dateString) return '';
     const date = new Date(dateString);
     if (isNaN(date)) return dateString; // Return original string if invalid
     const day = String(date.getDate()).padStart(2, '0');
@@ -123,7 +123,7 @@ function renderBoard(data) {
 
             const dataFormatada = formatDate(item["Data Contrato"]);
             const statusClass = getStatusClass(item["Status"]);
-            const duracao = item["Duração (dias)"] ? `${item["Duração (dias)"]} dias` : '';
+            const duracao = item["Duração (dias)"] && item["Duração (dias)"] >= 0 ? `${item["Duração (dias)"]} dias` : '';
 
             // Create details list
             const excludedKeys = ["Processo Administrativo", "Andamento - Objeto resumido", "Data Contrato", "Status", "Duração (dias)", "Fase Atual"];
