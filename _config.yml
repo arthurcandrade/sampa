@@ -19,18 +19,16 @@
 # in the templates via {{ site.myvariable }}.
 
 title: SAMPA
-email: arthur.c.andrade@tjgo.jus.br
+email: arthurcandrade@hotmail.com
 description: >- # this means to ignore newlines until "baseurl:"
   Sistema de Análise e Monitoramento do Planejamento de Aquisições (SAMPA).
   Um dashboard para acompanhamento de processos de aquisição no TJGO.
 baseurl: "/sampa"
-url: "https://arthurdelarge.github.io"
-github_username:  arthurdelarge
+url: "https://arthurcandrade.github.io"
+github_username:  arthurcandrade
 
 # Build settings
 theme: minima
-plugins:
-  - jekyll-feed
 
 # Exclude from processing.
 # The following items will not be processed, by default.
