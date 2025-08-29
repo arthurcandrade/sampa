@@ -12,11 +12,12 @@ O projeto **SAMPA** tem como objetivo fornecer um dashboard visual e intuitivo p
 
 Este projeto foi desenvolvido como parte do programa de **Residência em Tecnologia da Informação**, em parceria entre **Tribunal de Justiça do Estado de Goiás (TJGO)** e **Universidade Federal de Goiás (UFG)** para a **Coordenadoria de Contratos e Aquisições (CCA)** do **TJGO**.
 
+
 ## Funcionalidades
 
 - **Visualização em Kanban:** Os processos são organizados em colunas que representam as diferentes fases do planejamento (Ex: Seleção, Gestão, Planejamento).
 - **Cards Detalhados:** Cada processo é representado por um card que exibe informações essenciais como título, status e duração.
-- **Carregamento Dinâmico:** Os dados do painel são carregados dinamicamente, permitindo que o conteúdo seja atualizado sem a necessidade de alterar o código-fonte HTML.
+- **Carregamento Dinâmico:** Os dados do painel são consumidos de uma API externa, permitindo que o conteúdo seja atualizado diretamente da fonte de dados (planilha) sem a necessidade de fazer deploy de uma nova versão do site.
 - **Design Limpo e Responsivo:** A interface é projetada para ser clara e funcional em diferentes tamanhos de tela.
 
 ## Tecnologias Utilizadas
@@ -25,6 +26,10 @@ Este projeto foi desenvolvido como parte do programa de **Residência em Tecnolo
   - HTML5
   - CSS3 (com estilos customizados)
   - JavaScript
+
+- **Backend (Desacoplado):**
+  - **[Google Apps Script](https://developers.google.com/apps-script):** Utilizado para criar uma API que expõe os dados.
+  - **[Google Sheets](https://www.google.com/sheets/about/):** Atua como banco de dados, armazenando as informações dos processos.
 
 - **Frameworks e Bibliotecas:**
   - **[Jekyll](https://jekyllrb.com/):** Gerador de sites estáticos utilizado como base do projeto.
