@@ -18,16 +18,14 @@
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
 
-title: Your awesome title
-email: your-email@example.com
+title: SAMPA
+email: arthur.c.andrade@tjgo.jus.br
 description: >- # this means to ignore newlines until "baseurl:"
-  Write an awesome description for your new site here. You can edit this
-  line in _config.yml. It will appear in your document head meta (for
-  Google search results) and in your feed.xml site description.
-baseurl: "" # the subpath of your site, e.g. /blog
-url: "" # the base hostname & protocol for your site, e.g. http://example.com
-twitter_username: jekyllrb
-github_username:  jekyll
+  Sistema de Análise e Monitoramento do Planejamento de Aquisições (SAMPA).
+  Um dashboard para acompanhamento de processos de aquisição no TJGO.
+baseurl: "/sampa"
+url: "https://arthurdelarge.github.io"
+github_username:  arthurdelarge
 
 # Build settings
 theme: minima
