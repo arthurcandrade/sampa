@@ -26,7 +26,9 @@ async function fetchData() {
 
 function formatProcesso(processo) {
     if (!processo) return '';
-    let formatted = String(processo).substring(6);
+    const s = String(processo);
+    // Remove first 6 characters then trim leading zeros
+    const formatted = s.length > 6 ? s.substring(6) : s;
     return formatted.replace(/^0+/, '');
 }
 
@@ -97,8 +99,8 @@ function renderBoard(data) {
         const details = columnDetails[columnName];
         columnEl.className = `kanban-column ${details.className}`;
 
-        const titleEl = document.createElement('h2');
-        titleEl.innerHTML = `${details.emoji} ${columnName}`;
+    const titleEl = document.createElement('h2');
+    titleEl.innerHTML = `<span class="icon">${details.emoji}</span> <span class="col-title">${columnName}</span>`;
         columnEl.appendChild(titleEl);
 
         columns[columnName].forEach(item => {
@@ -106,8 +108,18 @@ function renderBoard(data) {
             cardEl.className = 'kanban-card';
 
             const processoOriginal = item["Processo Administrativo"];
-            const processoFormatado = formatProcesso(processoOriginal);
-            const processoUrl = `https://proad-v2.tjgo.jus.br/proad/processo/cadastro?id=${processoOriginal}`;
+            // Handle multiple processo values: sanitize each (remove first 6 chars + leading zeros)
+            // and create a link for each one using the sanitized number in the id parameter.
+            let sanitizedParts = [];
+            let processoLinksHtml = '';
+            if (processoOriginal) {
+                const parts = String(processoOriginal).trim().split(/\s+/);
+                sanitizedParts = parts.map(p => formatProcesso(p)).filter(Boolean);
+                processoLinksHtml = sanitizedParts.map(sp => {
+                    const url = `https://proad-v2.tjgo.jus.br/proad/processo/cadastro?id=${encodeURIComponent(sp)}`;
+                    return `<a href="${url}" target="_blank"><strong>${sp}</strong></a>`;
+                }).join('<br>');
+            }
 
             const dataFormatada = formatDate(item["Data Contrato"]);
             const statusClass = getStatusClass(item["Status"]);
@@ -130,9 +142,7 @@ function renderBoard(data) {
 
             cardEl.innerHTML = `
                 <div class="kanban-card-header">
-                    <a href="${processoUrl}" target="_blank">
-                        <strong>${processoFormatado}</strong>
-                    </a>
+                    ${processoLinksHtml ? `<div class="processo-links">${processoLinksHtml}</div>` : ''}
                     ${duracao ? `<span class="duration-badge">${duracao}</span>` : ''}
                 </div>
                 <div class="kanban-card-body">
@@ -145,11 +155,14 @@ function renderBoard(data) {
                 <div class="kanban-card-details">${detailsHtml}</div>
                 <div class="expand-btn">Ver mais</div>
             `;
+            const expandedKey = item['Item no Plano de Contratações'] || (sanitizedParts && sanitizedParts.length ? sanitizedParts.join(' / ') : processoOriginal) || '';
+            if (expandedKey) cardEl.dataset.expandedKey = expandedKey;
             columnEl.appendChild(cardEl);
         });
 
         kanbanBoard.appendChild(columnEl);
     }
+    restoreExpandState();
     addExpandListeners();
 }
 
@@ -158,14 +171,38 @@ function addExpandListeners() {
     expandBtns.forEach(btn => {
         btn.addEventListener('click', () => {
             const details = btn.previousElementSibling;
+            const card = btn.closest('.kanban-card');
+            const key = card ? card.dataset.expandedKey : null;
             if (details.style.display === 'grid') {
                 details.style.display = 'none';
                 btn.textContent = 'Ver mais';
+                if (key) localStorage.setItem('expanded::' + key, 'false');
             } else {
                 details.style.display = 'grid';
                 btn.textContent = 'Ver menos';
+                if (key) localStorage.setItem('expanded::' + key, 'true');
             }
         });
+    });
+}
+
+// Persist expand/collapse state using localStorage
+function restoreExpandState() {
+    const cards = document.querySelectorAll('.kanban-card');
+    cards.forEach(card => {
+        const key = card.dataset.expandedKey;
+        const details = card.querySelector('.kanban-card-details');
+        const btn = card.querySelector('.expand-btn');
+        if (!key || !details || !btn) return;
+        const saved = localStorage.getItem('expanded::' + key);
+        if (saved === 'true') {
+            details.style.display = 'grid';
+            btn.textContent = 'Ver menos';
+        } else {
+            details.style.display = 'none';
+            btn.textContent = 'Ver mais';
+        }
+    // Do not attach click handler here to avoid duplicates; addExpandListeners will manage persistence
     });
 }
 
