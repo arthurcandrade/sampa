@@ -57,14 +57,6 @@ function getStatusClass(status) {
             return 'status-contratado';
         case 'em-andamento':
             return 'status-em-andamento';
-        case 'em-planejamento':
-            return 'status-planejamento';
-        case 'deserto':
-            return 'status-deserto';
-        case 'fracassado':
-            return 'status-fracassado';
-        case 'suspenso':
-            return 'status-suspenso';
         default:
             return 'status-default';
     }
