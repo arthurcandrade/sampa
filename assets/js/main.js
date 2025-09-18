@@ -2,15 +2,31 @@ const apiUrl = 'https://script.google.com/macros/s/AKfycbw0V2iYm5m1Uw_1sX39rtq5C
 const kanbanBoard = document.getElementById('kanban-board');
 
 const columns = {
-    "Planejamento da Contratação": [],
-    "Seleção de Fornecedor": [],
-    "Gestão do Contrato": []
+    "1 - CCA / Gestor - Planejamento/Diligência": [],
+    "1.1 - Financeira - Apuração Índice Reajuste": [],
+    "2 - Geral - Atesto - Conveniência / Oportunidade": [],
+    "3 - Contratações - Orçamento / Mapa Estimativo": [],
+    "4 - Contratações/Geral - Relatório da Contratação": [],
+    "5 - Financeira - Disponibilidade orçamentária": [],
+    "6 - Elaboração Editais - Minuta do Edital": [],
+    "7 - Geral - Parecer / Autorização": [],
+    "8 - Licitação - Seleção de Fornecedor": [],
+    "9 - Financeira - Emissão Empenho": [],
+    "10 - Geral/Financeira - Assinatura Contrato / Publicação Extrato / Cadastro Contratosgov": []
 };
 
 const columnDetails = {
-    "Planejamento da Contratação": { emoji: '📝', className: 'kanban-column-planejamento' },
-    "Seleção de Fornecedor": { emoji: '🤝', className: 'kanban-column-selecao' },
-    "Gestão do Contrato": { emoji: '📄', className: 'kanban-column-gestao' }
+    "1 - CCA / Gestor - Planejamento/Diligência": { title: "CCA / Gestor - Planejamento/Diligência", emoji: '📝', className: 'kanban-column-default-0' },
+    "1.1 - Financeira - Apuração Índice Reajuste": { title: "Financeira - Apuração Índice Reajuste", emoji: '🤝', className: 'kanban-column-default-1' },
+    "2 - Geral - Atesto - Conveniência / Oportunidade": { title: "Geral - Atesto - Conveniência / Oportunidade", emoji: '📄', className: 'kanban-column-default-2' },
+    "3 - Contratações - Orçamento / Mapa Estimativo": { title: "Contratações - Orçamento / Mapa Estimativo", emoji: '🚀', className: 'kanban-column-default-3' },
+    "4 - Contratações/Geral - Relatório da Contratação": { title: "Contratações/Geral - Relatório da Contratação", emoji: '✅', className: 'kanban-column-default-4' },
+    "5 - Financeira - Disponibilidade orçamentária": { title: "Financeira - Disponibilidade orçamentária", emoji: '⏳', className: 'kanban-column-default-5' },
+    "6 - Elaboração Editais - Minuta do Edital": { title: "Elaboração Editais - Minuta do Edital", emoji: '💡', className: 'kanban-column-default-6' },
+    "7 - Geral - Parecer / Autorização": { title: "Geral - Parecer / Autorização", emoji: '📝', className: 'kanban-column-default-7' },
+    "8 - Licitação - Seleção de Fornecedor": { title: "Licitação - Seleção de Fornecedor", emoji: '🤝', className: 'kanban-column-default-8' },
+    "9 - Financeira - Emissão Empenho": { title: "Financeira - Emissão Empenho", emoji: '📄', className: 'kanban-column-default-9' },
+    "10 - Geral/Financeira - Assinatura Contrato / Publicação Extrato / Cadastro Contratosgov": { title: "Geral/Financeira - Assinatura Contrato / Publicação Extrato / Cadastro Contratosgov", emoji: '🚀', className: 'kanban-column-default-10' }
 };
 
 async function fetchData() {
@@ -69,8 +85,8 @@ function renderBoard(data) {
     // Group data into columns
     if (Array.isArray(data)) {
         data.forEach(item => {
-            if (columns.hasOwnProperty(item["Fase Atual"])) {
-                columns[item["Fase Atual"]].push(item);
+            if (columns.hasOwnProperty(item["SAMPA - Categoria/Etapa"])) {
+                columns[item["SAMPA - Categoria/Etapa"]].push(item);
             }
         });
     }
@@ -101,11 +117,19 @@ function renderBoard(data) {
     for (const columnName in columns) {
         const columnEl = document.createElement('div');
         const details = columnDetails[columnName];
+        if (!details) {
+            console.warn(`Column details not found for: ${columnName}`);
+            continue;
+        }
         columnEl.className = `kanban-column ${details.className}`;
 
-    const titleEl = document.createElement('h2');
-    titleEl.innerHTML = `<span class="icon">${details.emoji}</span> <span class="col-title">${columnName}</span>`;
+        const titleEl = document.createElement('h2');
+        titleEl.innerHTML = `<span class="icon">${details.emoji}</span> <span class="col-title">${details.title}</span>`;
         columnEl.appendChild(titleEl);
+
+        const cardsContainer = document.createElement('div');
+        cardsContainer.className = 'kanban-cards-container';
+        columnEl.appendChild(cardsContainer);
 
         columns[columnName].forEach(item => {
             const cardEl = document.createElement('div');
@@ -123,32 +147,7 @@ function renderBoard(data) {
                 }).join('<br>');
             }
 
-            const dataFormatada = formatDate(item["Data Contrato"]);
-            const statusClass = getStatusClass(item["Status"]);
             const duracao = item["Duração (dias)"] && item["Duração (dias)"] >= 0 ? `${item["Duração (dias)"]} dias` : '';
-
-            const expandedKey = item['Item no Plano de Contratações'] || (sanitizedParts.length ? sanitizedParts.join(' / ') : processoOriginal) || '';
-            if (expandedKey) {
-                cardEl.dataset.expandedKey = expandedKey;
-            }
-            const isExpanded = expandedKey ? localStorage.getItem('expanded::' + expandedKey) === 'true' : false;
-            const detailsDisplayStyle = isExpanded ? 'grid' : 'none';
-            const buttonText = isExpanded ? 'Ver menos' : 'Ver mais';
-
-            // Create details list
-            const excludedKeys = ["Processo Administrativo", "Andamento - Objeto resumido", "Data Contrato", "Status", "Duração (dias)", "Fase Atual"];
-            let detailsHtml = '';
-            for (const key in item) {
-                if (!excludedKeys.includes(key) && item[key]) {
-                    let value = item[key];
-                    if (key.toLowerCase().includes('data')) {
-                        value = formatDate(value);
-                    } else if (isCurrency(key)) {
-                        value = formatCurrency(value);
-                    }
-                    detailsHtml += `<div class="detail-item"><span class="detail-key">${key}</span><span class="detail-value">${value}</span></div>`;
-                }
-            }
 
             cardEl.innerHTML = `
                 <div class="kanban-card-header">
@@ -158,14 +157,8 @@ function renderBoard(data) {
                 <div class="kanban-card-body">
                     ${item["Andamento - Objeto resumido"]}
                 </div>
-                <div class="kanban-card-footer">
-                    <span>${dataFormatada}</span>
-                    <span class="status-badge ${statusClass}">${item["Status"]}</span>
-                </div>
-                <div class="kanban-card-details" style="display: ${detailsDisplayStyle};">${detailsHtml}</div>
-                <div class="expand-btn">${buttonText}</div>
             `;
-            columnEl.appendChild(cardEl);
+            cardsContainer.appendChild(cardEl);
         });
 
         fragment.appendChild(columnEl);
@@ -176,23 +169,42 @@ function renderBoard(data) {
     kanbanBoard.appendChild(fragment);
 }
 
+function formatProcesso(processo) {
+    if (!processo) return '';
+    const s = String(processo);
+    // Remove first 6 characters then trim leading zeros
+    const formatted = s.length > 6 ? s.substring(6) : s;
+    return formatted.replace(/^0+/, '');
+}
+
+function formatDate(dateString) {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    if (isNaN(date)) return dateString; // Return original string if invalid
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+}
+
+function formatCurrency(value) {
+    const num = parseFloat(value);
+    if (isNaN(num)) return value;
+    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(num);
+}
+
+function getStatusClass(status) {
+    if (!status) return 'status-default';
+    return `status-${status.toLowerCase().replace(/\s+/g, '-')}`;
+}
+
+function isCurrency(key) {
+    const lowerKey = key.toLowerCase();
+    return lowerKey.includes('valor') || lowerKey.includes('investimento') || lowerKey.includes('estimativa') || lowerKey.includes('empenhado') || lowerKey.includes('custeio');
+}
+
 function setupEventListeners() {
-    kanbanBoard.addEventListener('click', (event) => {
-        const expandBtn = event.target.closest('.expand-btn');
-        if (!expandBtn) return; // Click was not on an expand button
-
-        const details = expandBtn.previousElementSibling;
-        const card = expandBtn.closest('.kanban-card');
-        const key = card ? card.dataset.expandedKey : null;
-
-        const isVisible = details.style.display === 'grid';
-        details.style.display = isVisible ? 'none' : 'grid';
-        expandBtn.textContent = isVisible ? 'Ver mais' : 'Ver menos';
-
-        if (key) {
-            localStorage.setItem('expanded::' + key, !isVisible);
-        }
-    });
+    // No event listeners needed for now.
 }
 
 document.addEventListener('DOMContentLoaded', () => {
