@@ -16,27 +16,51 @@ const columns = {
 };
 
 const columnDetails = {
-    "1 - CCA / Gestor - Planejamento/Diligência": { title: "CCA / Gestor - Planejamento/Diligência", emoji: '📝', className: 'kanban-column-default-0' },
-    "1.1 - Financeira - Apuração Índice Reajuste": { title: "Financeira - Apuração Índice Reajuste", emoji: '🤝', className: 'kanban-column-default-1' },
-    "2 - Geral - Atesto - Conveniência / Oportunidade": { title: "Geral - Atesto - Conveniência / Oportunidade", emoji: '📄', className: 'kanban-column-default-2' },
-    "3 - Contratações - Orçamento / Mapa Estimativo": { title: "Contratações - Orçamento / Mapa Estimativo", emoji: '🚀', className: 'kanban-column-default-3' },
-    "4 - Contratações/Geral - Relatório da Contratação": { title: "Contratações/Geral - Relatório da Contratação", emoji: '✅', className: 'kanban-column-default-4' },
-    "5 - Financeira - Disponibilidade orçamentária": { title: "Financeira - Disponibilidade orçamentária", emoji: '⏳', className: 'kanban-column-default-5' },
-    "6 - Elaboração Editais - Minuta do Edital": { title: "Elaboração Editais - Minuta do Edital", emoji: '💡', className: 'kanban-column-default-6' },
-    "7 - Geral - Parecer / Autorização": { title: "Geral - Parecer / Autorização", emoji: '📝', className: 'kanban-column-default-7' },
-    "8 - Licitação - Seleção de Fornecedor": { title: "Licitação - Seleção de Fornecedor", emoji: '🤝', className: 'kanban-column-default-8' },
-    "9 - Financeira - Emissão Empenho": { title: "Financeira - Emissão Empenho", emoji: '📄', className: 'kanban-column-default-9' },
-    "10 - Geral/Financeira - Assinatura Contrato / Publicação Extrato / Cadastro Contratosgov": { title: "Geral/Financeira - Assinatura Contrato / Publicação Extrato / Cadastro Contratosgov", emoji: '🚀', className: 'kanban-column-default-10' }
+    "1 - CCA / Gestor - Planejamento/Diligência": { title: "<h5>CCA / Gestor</h5>Planejamento<br>Diligência", emoji: '📝', className: 'kanban-column-default-0' },
+    "1.1 - Financeira - Apuração Índice Reajuste": { title: "<h5>Financeira</h5>Apuração<br>Índice Reajuste", emoji: '🤝', className: 'kanban-column-default-1' },
+    "2 - Geral - Atesto - Conveniência / Oportunidade": { title: "<h5>Geral</h5>Atesto<br>Conv/Oport", emoji: '📄', className: 'kanban-column-default-2' },
+    "3 - Contratações - Orçamento / Mapa Estimativo": { title: "<h5>Contratações</h5>Orçamento<br>Mapa Estimativo", emoji: '🚀', className: 'kanban-column-default-3' },
+    "4 - Contratações/Geral - Relatório da Contratação": { title: "<h5>Geral</h5>Relatório<br>Contratação", emoji: '✅', className: 'kanban-column-default-4' },
+    "5 - Financeira - Disponibilidade orçamentária": { title: "<h5>Financeira</h5>Disponibilidade<br>Orçamentária", emoji: '⏳', className: 'kanban-column-default-5' },
+    "6 - Elaboração Editais - Minuta do Edital": { title: "<h5>Editais</h5>Minuta<br>Edital", emoji: '💡', className: 'kanban-column-default-6' },
+    "7 - Geral - Parecer / Autorização": { title: "<h5>Geral</h5>Parecer/<br>Autorização", emoji: '📝', className: 'kanban-column-default-7' },
+    "8 - Licitação - Seleção de Fornecedor": { title: "<h5>Licitação</h5>Seleção<br>Fornecedor", emoji: '🤝', className: 'kanban-column-default-8' },
+    "9 - Financeira - Emissão Empenho": { title: "<h5>Financeira</h5>Emissão<br>Empenho", emoji: '📄', className: 'kanban-column-default-9' },
+    "10 - Geral/Financeira - Assinatura Contrato / Publicação Extrato / Cadastro Contratosgov": { title: "<h5>Geral/Financeira</h5>Contrato/Extrato<br>ContratosGOV", emoji: '🚀', className: 'kanban-column-default-10' }
 };
 
-async function fetchData() {
+async function fetchData(isInitialLoad = false) {
+    const cachedData = localStorage.getItem('kanbanData');
+
+    if (isInitialLoad && cachedData) {
+        try {
+            // Render cached data immediately on initial load to avoid "loading" flash
+            renderBoard(JSON.parse(cachedData));
+        } catch (e) {
+            console.error("Error parsing cached data:", e);
+            localStorage.removeItem('kanbanData'); // Clear potentially corrupted cache
+        }
+    }
+
     try {
         const response = await fetch(apiUrl);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
         const data = await response.json();
-        renderBoard(data);
+        const dataString = JSON.stringify(data);
+
+        // Update cache and re-render only if data has changed
+        if (cachedData !== dataString) {
+            localStorage.setItem('kanbanData', dataString);
+            renderBoard(data);
+        }
     } catch (error) {
         console.error('Error fetching data:', error);
-        kanbanBoard.innerHTML = '<p>Erro ao carregar dados. Tente novamente mais tarde.</p>';
+        // Only show the error message in the UI if there's no cached data to display
+        if (!localStorage.getItem('kanbanData')) {
+            kanbanBoard.innerHTML = '<p>Erro ao carregar dados. Tente novamente mais tarde.</p>';
+        }
     }
 }
 
@@ -169,40 +193,6 @@ function renderBoard(data) {
     kanbanBoard.appendChild(fragment);
 }
 
-function formatProcesso(processo) {
-    if (!processo) return '';
-    const s = String(processo);
-    // Remove first 6 characters then trim leading zeros
-    const formatted = s.length > 6 ? s.substring(6) : s;
-    return formatted.replace(/^0+/, '');
-}
-
-function formatDate(dateString) {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    if (isNaN(date)) return dateString; // Return original string if invalid
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const year = date.getFullYear();
-    return `${day}/${month}/${year}`;
-}
-
-function formatCurrency(value) {
-    const num = parseFloat(value);
-    if (isNaN(num)) return value;
-    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(num);
-}
-
-function getStatusClass(status) {
-    if (!status) return 'status-default';
-    return `status-${status.toLowerCase().replace(/\s+/g, '-')}`;
-}
-
-function isCurrency(key) {
-    const lowerKey = key.toLowerCase();
-    return lowerKey.includes('valor') || lowerKey.includes('investimento') || lowerKey.includes('estimativa') || lowerKey.includes('empenhado') || lowerKey.includes('custeio');
-}
-
 function setupEventListeners() {
     // No event listeners needed for now.
 }
@@ -234,9 +224,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const initialTheme = savedTheme || (prefersDark ? 'dark' : 'light');
     applyTheme(initialTheme);
+
+    // Initial data load and setup periodic refresh
+    fetchData(true);
+    setInterval(() => fetchData(false), 30000);
 });
-
-
-setupEventListeners();
-fetchData();
-setInterval(fetchData, 30000);
