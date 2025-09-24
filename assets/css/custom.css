@@ -27,7 +27,7 @@ html, body {
 }
 .title-container h1 {
     font-weight: 700;
-    font-size: 2.5rem;
+    font-size: 1.8rem;
     margin-bottom: 0;
 }
 .title-container h2 {
@@ -63,8 +63,8 @@ html, body {
     /* Start/end in the middle of the first/last columns */
     left: calc((100% / 11) / 2);
     right: calc((100% / 11) / 2);
-    bottom: 6rem; /* Vertically align with icons */
-    z-index: 0; /* Behind icons */
+    bottom: 6.5rem; /* Vertically align with icons */
+    z-index: 0; /* Behind icons, but in front of board background */
 }
 
 .kanban-board p {
@@ -77,7 +77,6 @@ html, body {
     flex: 1 1 0; /* Grow and shrink equally */
     border-radius: 0.5rem;
     padding: 0.25rem;
-    box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px -1px rgba(0,0,0,0.1); /* Subtle shadow */
     border: 1px solid transparent; /* Border color will be on specific columns */
     display: flex;
     flex-direction: column;
@@ -106,25 +105,47 @@ html, body {
 .kanban-column h2 span.icon {
     font-size: 1.5rem;
     line-height: 1;
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
     transform: none;
     filter: drop-shadow(0 2px 6px rgba(0,0,0,0.12));
     position: relative;
     z-index: 1; /* Above the board line */
-    background: #f0f2f5;
-    padding: 0 0.5rem;
     border-radius: 50%;
+    color: white;
 }
+
+/* Icon background colors */
+.kanban-column-default-0 .icon { background-color: #f59e0b; }
+.kanban-column-default-1 .icon { background-color: #10b981; }
+.kanban-column-default-2 .icon { background-color: #3b82f6; }
+.kanban-column-default-3 .icon { background-color: #ef4444; }
+.kanban-column-default-4 .icon { background-color: #8b5cf6; }
+.kanban-column-default-5 .icon { background-color: #d946ef; }
+.kanban-column-default-6 .icon { background-color: #0ea5e9; }
+.kanban-column-default-7 .icon { background-color: #65a30d; }
+.kanban-column-default-8 .icon { background-color: #f59e0b; }
+.kanban-column-default-9 .icon { background-color: #10b981; }
+.kanban-column-default-10 .icon { background-color: #3b82f6; }
+
+
 .kanban-column h2 span.col-title {
     font-size: 0.8rem;
     font-weight: 600;
     word-break: break-word;
+    position: relative;
+    z-index: 1;
 }
 
 .kanban-cards-container {
     overflow-y: auto;
     flex-grow: 1;
     order: 1;
+    display: flex;
+    flex-direction: column-reverse;
 }
 .kanban-card {
     background-color: #ffffff;
@@ -136,7 +157,25 @@ html, body {
     flex-direction: column;
     padding: 0;
     transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+    position: relative;
+    border-top-color: #ffffff;
 }
+
+.kanban-card::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 8px solid;
+    border-top-color: inherit;
+    filter: brightness(95%);
+}
+
 .kanban-card:hover {
     transform: translateY(-2px);
     box-shadow: 0 2px 0 0 #e5e7eb, 0 4px 10px rgba(0,0,0,0.1);
@@ -237,15 +276,19 @@ html, body {
 }
 /* Footer */
 .site-footer {
-    padding: 1rem;
+    padding: 0.5rem 1rem;
     text-align: center;
-    color: #6b7280;
     font-size: 0.9rem;
-    border-top: 1px solid #e5e7eb;
     flex-shrink: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #1f2937;
+    color: #d1d5db;
+    border-top: 1px solid #374151;
 }
 .site-footer a.github-link {
-    color: #1f2937;
+    color: #f9fafb;
     text-decoration: none;
     display: inline-flex;
     align-items: center;
@@ -264,14 +307,11 @@ html, body {
 }
 
 .theme-switcher-container {
-    position: absolute;
-    top: 1rem;
-    right: 1.5rem;
 }
 
 .theme-toggle-btn {
-    background-color: #f3f4f6;
-    border: 1px solid #d1d5db;
+    background-color: #4b5563;
+    border: 1px solid #6b7280;
     border-radius: 2rem;
     width: 44px;
     height: 44px;
@@ -284,13 +324,13 @@ html, body {
 }
 
 .theme-toggle-btn:hover {
-    background-color: #e5e7eb;
+    background-color: #6b7280;
 }
 
 .theme-toggle-btn svg {
     width: 22px;
     height: 22px;
-    fill: #4b5563;
+    fill: #d1d5db;
     transition: fill 0.2s ease;
 }
 
@@ -332,9 +372,17 @@ body.dark-theme .kanban-column-gestao { background-color: #144238; border-color:
 body.dark-theme .kanban-column-planejamento { background-color: #28325a; border-color: #6366f1; }
 
 body.dark-theme .kanban-column h2 { color: #f9fafb; }
-body.dark-theme .kanban-column h2 span.icon { background: #111827; }
 
-body.dark-theme .kanban-card { background-color: #1f2937; border: 1px solid #374151; box-shadow: 0 2px 0 0 #111827, 0 3px 5px rgba(0,0,0,0.2); }
+body.dark-theme .kanban-card {
+    background-color: #1f2937;
+    border: 1px solid #374151;
+    box-shadow: 0 2px 0 0 #111827, 0 3px 5px rgba(0,0,0,0.2);
+    border-top-color: #1f2937;
+}
+
+body.dark-theme .kanban-card::after {
+    border-top-color: inherit;
+}
 
 body.dark-theme .kanban-card:hover {
     /* transform is inherited from light theme */
@@ -357,7 +405,12 @@ body.dark-theme .detail-key { color: #9ca3af; }
 body.dark-theme .detail-value { color: #f9fafb; }
 body.dark-theme .expand-btn { background-color: #374151; border-top: 1px solid #4b5563; color: #9ca3af; }
 body.dark-theme .expand-btn:hover { background-color: #4b5563; }
-body.dark-theme .site-footer { color: #9ca3af; border-top: 1px solid #374151; }
+
+body.dark-theme .site-footer {
+    background-color: #111827;
+    color: #9ca3af;
+    border-top: 1px solid #374151;
+}
 body.dark-theme .site-footer a.github-link { color: #f9fafb; }
 body.dark-theme .site-footer a.github-link svg { fill: #f9fafb; }
 

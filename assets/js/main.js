@@ -16,17 +16,17 @@ const columns = {
 };
 
 const columnDetails = {
-    "1 - CCA / Gestor - Planejamento/Diligência": { title: "<h5>CCA / Gestor</h5>Planejamento<br>Diligência", emoji: '📝', className: 'kanban-column-default-0' },
-    "1.1 - Financeira - Apuração Índice Reajuste": { title: "<h5>Financeira</h5>Apuração<br>Índice Reajuste", emoji: '🤝', className: 'kanban-column-default-1' },
-    "2 - Geral - Atesto - Conveniência / Oportunidade": { title: "<h5>Geral</h5>Atesto<br>Conv/Oport", emoji: '📄', className: 'kanban-column-default-2' },
-    "3 - Contratações - Orçamento / Mapa Estimativo": { title: "<h5>Contratações</h5>Orçamento<br>Mapa Estimativo", emoji: '🚀', className: 'kanban-column-default-3' },
-    "4 - Contratações/Geral - Relatório da Contratação": { title: "<h5>Geral</h5>Relatório<br>Contratação", emoji: '✅', className: 'kanban-column-default-4' },
-    "5 - Financeira - Disponibilidade orçamentária": { title: "<h5>Financeira</h5>Disponibilidade<br>Orçamentária", emoji: '⏳', className: 'kanban-column-default-5' },
-    "6 - Elaboração Editais - Minuta do Edital": { title: "<h5>Editais</h5>Minuta<br>Edital", emoji: '💡', className: 'kanban-column-default-6' },
-    "7 - Geral - Parecer / Autorização": { title: "<h5>Geral</h5>Parecer/<br>Autorização", emoji: '📝', className: 'kanban-column-default-7' },
-    "8 - Licitação - Seleção de Fornecedor": { title: "<h5>Licitação</h5>Seleção<br>Fornecedor", emoji: '🤝', className: 'kanban-column-default-8' },
-    "9 - Financeira - Emissão Empenho": { title: "<h5>Financeira</h5>Emissão<br>Empenho", emoji: '📄', className: 'kanban-column-default-9' },
-    "10 - Geral/Financeira - Assinatura Contrato / Publicação Extrato / Cadastro Contratosgov": { title: "<h5>Geral/Financeira</h5>Contrato/Extrato<br>ContratosGOV", emoji: '🚀', className: 'kanban-column-default-10' }
+    "1 - CCA / Gestor - Planejamento/Diligência": { title: "<h5>CCA / Gestor</h5>Planejamento<br>Diligência", icon: 'bi-clipboard-check', className: 'kanban-column-default-0' },
+    "1.1 - Financeira - Apuração Índice Reajuste": { title: "<h5>Financeira</h5>Apuração<br>Índice Reajuste", icon: 'bi-calculator', className: 'kanban-column-default-1' },
+    "2 - Geral - Atesto - Conveniência / Oportunidade": { title: "<h5>Geral</h5>Atesto<br>Conv/Oport", icon: 'bi-file-earmark-text', className: 'kanban-column-default-2' },
+    "3 - Contratações - Orçamento / Mapa Estimativo": { title: "<h5>Contratações</h5>Orçamento<br>Mapa Estimativo", icon: 'bi-cash-stack', className: 'kanban-column-default-3' },
+    "4 - Contratações/Geral - Relatório da Contratação": { title: "<h5>Geral</h5>Relatório<br>Contratação", icon: 'bi-journal-text', className: 'kanban-column-default-4' },
+    "5 - Financeira - Disponibilidade orçamentária": { title: "<h5>Financeira</h5>Disponibilidade<br>Orçamentária", icon: 'bi-bank', className: 'kanban-column-default-5' },
+    "6 - Elaboração Editais - Minuta do Edital": { title: "<h5>Editais</h5>Minuta<br>Edital", icon: 'bi-pencil-square', className: 'kanban-column-default-6' },
+    "7 - Geral - Parecer / Autorização": { title: "<h5>Geral</h5>Parecer/<br>Autorização", icon: 'bi-check2-square', className: 'kanban-column-default-7' },
+    "8 - Licitação - Seleção de Fornecedor": { title: "<h5>Licitação</h5>Seleção<br>Fornecedor", icon: 'bi-trophy', className: 'kanban-column-default-8' },
+    "9 - Financeira - Emissão Empenho": { title: "<h5>Financeira</h5>Emissão<br>Empenho", icon: 'bi-receipt', className: 'kanban-column-default-9' },
+    "10 - Geral/Financeira - Assinatura Contrato / Publicação Extrato / Cadastro Contratosgov": { title: "<h5>Geral/Financeira</h5>Contrato/Extrato<br>ContratosGOV", icon: 'bi-pen', className: 'kanban-column-default-10' }
 };
 
 async function fetchData(isInitialLoad = false) {
@@ -148,7 +148,7 @@ function renderBoard(data) {
         columnEl.className = `kanban-column ${details.className}`;
 
         const titleEl = document.createElement('h2');
-        titleEl.innerHTML = `<span class="icon">${details.emoji}</span> <span class="col-title">${details.title}</span>`;
+        titleEl.innerHTML = `<span class="icon"><i class="bi ${details.icon}"></i></span> <span class="col-title">${details.title}</span>`;
         columnEl.appendChild(titleEl);
 
         const cardsContainer = document.createElement('div');
@@ -173,13 +173,17 @@ function renderBoard(data) {
 
             const duracao = item["Duração (dias)"] && item["Duração (dias)"] >= 0 ? `${item["Duração (dias)"]} dias` : '';
 
+            const summary = item["Andamento - Objeto resumido"] || '';
+            const parts = summary.split(' - ');
+            const displaySummary = parts.length > 1 ? parts.slice(1).join(' - ') : summary;
+
             cardEl.innerHTML = `
                 <div class="kanban-card-header">
                     ${processoLinksHtml ? `<div class="processo-links">${processoLinksHtml}</div>` : ''}
                     ${duracao ? `<span class="duration-badge">${duracao}</span>` : ''}
                 </div>
                 <div class="kanban-card-body">
-                    ${item["Andamento - Objeto resumido"]}
+                    ${displaySummary}
                 </div>
             `;
             cardsContainer.appendChild(cardEl);
