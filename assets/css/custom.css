@@ -211,7 +211,7 @@ html, body {
 .kanban-card-body {
     padding: 0.5rem;
     flex-grow: 1;
-    font-size: 0.75rem;
+    font-size: 1rem;
 }
 .kanban-card-footer {
     padding: 0.3rem 0.5rem;
@@ -512,4 +512,27 @@ body.dark-theme .theme-toggle-btn #theme-toggle-light-icon {
     .kanban-cards-container {
         order: 2;
     }
+}
+
+/* Custom Scrollbar Styles */
+.kanban-cards-container::-webkit-scrollbar {
+    width: 4px;
+}
+
+.kanban-cards-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.kanban-cards-container::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+.kanban-cards-container::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+.kanban-cards-container {
+    scrollbar-width: thin;
+    scrollbar-color: #888 #f1f1f1;
 }
