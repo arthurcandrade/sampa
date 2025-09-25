@@ -496,16 +496,183 @@ body.dark-theme .theme-toggle-btn #theme-toggle-light-icon {
 }
 
 .andamentos-item {
+    display: flex;
+    align-items: stretch;
     background-color: #ffffff;
     border: 1px solid #e5e7eb;
-    border-radius: 0.5rem;
-    padding: 1rem;
+    border-radius: 0.75rem; /* Softer corners */
+    margin-bottom: 1.5rem; /* More space between items */
+    padding: 0;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* Soft shadow */
+    transition: box-shadow 0.2s ease-in-out;
+}
+
+.andamentos-item:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.andamento-item-left {
+    flex-basis: 10%;
+    padding: 1.5rem;
+    border-right: 1px solid #f3f4f6;
+}
+
+.andamento-item-middle-left {
+    flex-basis: 30%;
+    padding: 1.5rem;
+    border-right: 1px solid #f3f4f6;
+}
+
+.andamento-item-middle-right {
+    flex-basis: 50%;
+    padding: 1.5rem;
+    border-right: 1px solid #f3f4f6;
+}
+
+.andamento-item-right {
+    flex-basis: 10%;
+    padding: 1.5rem;
+}
+
+.andamento-item-square {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: flex;
+    flex-direction: column;
+}
+
+.andamento-item-square-top {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1px solid #f3f4f6;
+    font-size: 1.2rem;
+    font-weight: bold;
+    padding: 0.5rem;
+    text-align: center;
+}
+
+.andamento-item-square-top a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.andamento-item-square-top a:hover {
+    text-decoration: none;
+    color: #3b82f6;
+}
+
+.andamento-item-square-bottom {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+    text-align: center;
+    font-size: 1rem;
+}
+
+.andamento-item-square-title {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #6b7280;
+    margin-bottom: 0.5rem;
+}
+
+.andamento-item-summary {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
+
+.andamento-item-demanda {
+    font-size: 0.9rem;
+    color: #4b5563;
+}
+
+.andamento-item-progress-bar {
+    height: 20px; /* Thinner bar */
+    width: 100%;
+    background-color: #e5e7eb;
+    border-radius: 8px; /* Sharper corners */
     margin-bottom: 1rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.andamento-item-progress {
+    height: 100%;
+    background-color: #10b981;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    transition: width 1s ease-in-out;
+}
+
+.andamento-item-progress.completed {
+    background-color: #3b82f6;
+}
+
+.andamento-item-progress:not(.completed) {
+    background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
+    background-size: 40px 40px;
+    animation: progress-bar-stripes 1s linear infinite;
+}
+
+@keyframes progress-bar-stripes {
+    from {
+        background-position: 40px 0;
+    }
+    to {
+        background-position: 0 0;
+    }
+}
+
+.andamento-item-progress span {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    color: white;
+    font-size: 0.9rem;
+}
+
+.andamento-item-fields {
+    font-size: 0.9rem;
 }
 
 body.dark-theme .andamentos-item {
     background-color: #1f2937;
     border-color: #374151;
+    color: #f9fafb;
+}
+
+body.dark-theme .andamento-item-left,
+body.dark-theme .andamento-item-middle-left,
+body.dark-theme .andamento-item-middle-right {
+    border-right-color: #374151;
+}
+
+body.dark-theme .andamento-item-square-title {
+    color: #9ca3af;
+}
+
+body.dark-theme .andamento-item-demanda {
+    color: #d1d5db;
+}
+
+body.dark-theme .andamento-item-square-top a {
+    color: #f9fafb;
+}
+
+body.dark-theme .andamento-item-square-top a:hover {
+    color: #60a5fa;
 }
 
 /* --- Mobile Responsiveness --- */

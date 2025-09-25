@@ -200,20 +200,77 @@ function renderAndamentos() {
             const itemEl = document.createElement('div');
             itemEl.className = 'andamentos-item';
 
-            let detailsHtml = '';
-            for (const key in item) {
-                if (item.hasOwnProperty(key)) {
-                    let value = item[key];
-                    if (key.toLowerCase().includes('data')) {
-                        value = formatDate(value);
-                    } else if (isCurrency(key)) {
-                        value = formatCurrency(value);
-                    }
-                    detailsHtml += `<p><strong>${key}:</strong> ${value}</p>`;
-                }
+            const processoOriginal = item["Processo Administrativo"];
+            let sanitizedParts = [];
+            let processoLinksHtml = '';
+            if (processoOriginal) {
+                const parts = String(processoOriginal).trim().split(/\s+/);
+                sanitizedParts = parts.map(p => formatProcesso(p)).filter(Boolean);
+                processoLinksHtml = sanitizedParts.map(sp => {
+                    const url = `https://proad-v2.tjgo.jus.br/proad/processo/cadastro?id=${encodeURIComponent(sp)}`;
+                    return `<a href="${url}" target="_blank"><strong>${sp}</strong></a>`;
+                }).join('<br>');
             }
 
-            itemEl.innerHTML = detailsHtml;
+            const itemPlanoContratacoes = item["Item no Plano de Contratações"] || '';
+
+            const summary = item["Andamento - Objeto resumido"] || '';
+            const parts = summary.split(' - ');
+            const displaySummary = parts.length > 1 ? parts.slice(1).join(' - ') : summary;
+            const demanda = item["Demanda"] || '';
+
+            const od = item["SAMPA - OD"] || '';
+            const etp = item["SAMPA - ETP"] || '';
+            const ar = item["SAMPA - AR"] || '';
+            const tr = item["SAMPA - TR"] || '';
+            const am = item["SAMPA - AM"] || '';
+
+            const percentage = 50; // Placeholder
+
+            itemEl.innerHTML = `
+                <div class="andamento-item-left">
+                    <div class="andamento-item-square">
+                        <div class="andamento-item-square-top">
+                            <div class="andamento-item-square-title">Processo Proad</div>
+                            ${processoLinksHtml}
+                        </div>
+                        <div class="andamento-item-square-bottom">
+                            <div class="andamento-item-square-title">ID - PCA</div>
+                            ${itemPlanoContratacoes}
+                        </div>
+                    </div>
+                </div>
+                <div class="andamento-item-middle-left">
+                    <div class="andamento-item-summary">${displaySummary}</div>
+                    <div class="andamento-item-demanda">${demanda}</div>
+                </div>
+                <div class="andamento-item-middle-right">
+                    <div class="andamento-item-progress-bar">
+                        <div class="andamento-item-progress" style="width: ${percentage}%;">
+                            <span>${percentage}%</span>
+                        </div>
+                    </div>
+                    <div class="andamento-item-fields">
+                        <div>Oficialização de Demanda: ${od}</div>
+                        <div>Estudo Técnico Preliminar: ${etp}</div>
+                        <div>Mapa de Riscos: ${ar}</div>
+                        <div>Termo de Referência: ${tr}</div>
+                        <div>Análise de Mercado: ${am}</div>
+                    </div>
+                </div>
+                <div class="andamento-item-right">
+                    <div class="andamento-item-square">
+                        <div class="andamento-item-square-top">
+                            <div class="andamento-item-square-title">Previsão / Conclusão</div>
+                            <div>TBD</div>
+                        </div>
+                        <div class="andamento-item-square-bottom">
+                            <div class="andamento-item-square-title">Integrantes</div>
+                            <div>TBD</div>
+                        </div>
+                    </div>
+                </div>
+            `;
             fragment.appendChild(itemEl);
         });
     }
