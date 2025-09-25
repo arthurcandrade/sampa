@@ -1,6 +1,8 @@
 const apiUrl = 'https://script.google.com/macros/s/AKfycbw0V2iYm5m1Uw_1sX39rtq5CgG9XFAZwsYvV6pdnb-346KtOE6D_ndSikqbN0GZjioe/exec';
 const kanbanBoard = document.getElementById('kanban-board');
 
+let allData = []; // To store all fetched data
+
 const columns = {
     "1 - CCA / Gestor - Planejamento/Diligência": [],
     "1.1 - Financeira - Apuração Índice Reajuste": [],
@@ -34,8 +36,9 @@ async function fetchData(isInitialLoad = false) {
 
     if (isInitialLoad && cachedData) {
         try {
-            // Render cached data immediately on initial load to avoid "loading" flash
-            renderBoard(JSON.parse(cachedData));
+            const data = JSON.parse(cachedData);
+            allData = data;
+            renderBoard(data);
         } catch (e) {
             console.error("Error parsing cached data:", e);
             localStorage.removeItem('kanbanData'); // Clear potentially corrupted cache
@@ -48,16 +51,19 @@ async function fetchData(isInitialLoad = false) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
+        allData = data;
         const dataString = JSON.stringify(data);
 
-        // Update cache and re-render only if data has changed
         if (cachedData !== dataString) {
             localStorage.setItem('kanbanData', dataString);
             renderBoard(data);
+            // If andamentos view is active, re-render it with new data
+            if (document.getElementById('andamentos-view').classList.contains('active')) {
+                renderAndamentos();
+            }
         }
     } catch (error) {
         console.error('Error fetching data:', error);
-        // Only show the error message in the UI if there's no cached data to display
         if (!localStorage.getItem('kanbanData')) {
             kanbanBoard.innerHTML = '<p>Erro ao carregar dados. Tente novamente mais tarde.</p>';
         }
@@ -67,7 +73,6 @@ async function fetchData(isInitialLoad = false) {
 function formatProcesso(processo) {
     if (!processo) return '';
     const s = String(processo);
-    // Remove first 6 characters then trim leading zeros
     const formatted = s.length > 6 ? s.substring(6) : s;
     return formatted.replace(/^0+/, '');
 }
@@ -75,7 +80,7 @@ function formatProcesso(processo) {
 function formatDate(dateString) {
     if (!dateString) return '';
     const date = new Date(dateString);
-    if (isNaN(date)) return dateString; // Return original string if invalid
+    if (isNaN(date)) return dateString; 
     const day = String(date.getDate()).padStart(2, '0');
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const year = date.getFullYear();
@@ -99,14 +104,11 @@ function isCurrency(key) {
 }
 
 function renderBoard(data) {
-    // Use a DocumentFragment to build the board in memory, avoiding multiple DOM updates.
     const fragment = document.createDocumentFragment();
-    // Clear existing columns data
     for (const column in columns) {
         columns[column] = [];
     }
 
-    // Group data into columns
     if (Array.isArray(data)) {
         data.forEach(item => {
             if (columns.hasOwnProperty(item["SAMPA - Categoria/Etapa"])) {
@@ -115,29 +117,22 @@ function renderBoard(data) {
         });
     }
 
-    // Sort cards within each column by process number
     for (const columnName in columns) {
         columns[columnName].sort((a, b) => {
             const getFirstSanitizedProcessNumber = (item) => {
                 const processoOriginal = item["Processo Administrativo"];
-                if (!processoOriginal) return Infinity; // Itens sem processo vão para o final
-
+                if (!processoOriginal) return Infinity;
                 const firstPart = String(processoOriginal).trim().split(/\s+/)[0];
                 const sanitized = formatProcesso(firstPart);
-
-                // Converte para número para garantir a ordenação numérica correta
                 const num = parseInt(sanitized, 10);
                 return isNaN(num) ? Infinity : num;
             };
-
             const numA = getFirstSanitizedProcessNumber(a);
             const numB = getFirstSanitizedProcessNumber(b);
-
             return numA - numB;
         });
     }
 
-    // Render columns and cards
     for (const columnName in columns) {
         const columnEl = document.createElement('div');
         const details = columnDetails[columnName];
@@ -192,16 +187,69 @@ function renderBoard(data) {
         fragment.appendChild(columnEl);
     }
 
-    // Perform a single, efficient DOM update.
     kanbanBoard.innerHTML = '';
     kanbanBoard.appendChild(fragment);
 }
 
+function renderAndamentos() {
+    const andamentosList = document.getElementById('andamentos-list');
+    const fragment = document.createDocumentFragment();
+
+    if (Array.isArray(allData)) {
+        allData.forEach(item => {
+            const itemEl = document.createElement('div');
+            itemEl.className = 'andamentos-item';
+
+            let detailsHtml = '';
+            for (const key in item) {
+                if (item.hasOwnProperty(key)) {
+                    let value = item[key];
+                    if (key.toLowerCase().includes('data')) {
+                        value = formatDate(value);
+                    } else if (isCurrency(key)) {
+                        value = formatCurrency(value);
+                    }
+                    detailsHtml += `<p><strong>${key}:</strong> ${value}</p>`;
+                }
+            }
+
+            itemEl.innerHTML = detailsHtml;
+            fragment.appendChild(itemEl);
+        });
+    }
+
+    andamentosList.innerHTML = '';
+    andamentosList.appendChild(fragment);
+}
+
 function setupEventListeners() {
-    // No event listeners needed for now.
+    const atividadesView = document.getElementById('atividades-view');
+    const andamentosView = document.getElementById('andamentos-view');
+    const atividadesTab = document.getElementById('atividades-tab');
+    const andamentosTab = document.getElementById('andamentos-tab');
+
+    atividadesTab.addEventListener('click', () => {
+        atividadesView.style.display = 'flex';
+        andamentosView.style.display = 'none';
+        atividadesTab.classList.add('active');
+        andamentosTab.classList.remove('active');
+    });
+
+    andamentosTab.addEventListener('click', () => {
+        atividadesView.style.display = 'none';
+        andamentosView.style.display = 'flex';
+        andamentosTab.classList.add('active');
+        atividadesTab.classList.remove('active');
+        renderAndamentos(); // Render the list when tab is clicked
+    });
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    const atividadesView = document.getElementById('atividades-view');
+    const andamentosView = document.getElementById('andamentos-view');
+    atividadesView.style.display = 'flex';
+    andamentosView.style.display = 'none';
+
     const themeToggleButton = document.getElementById('theme-toggle');
     const body = document.body;
 
@@ -229,7 +277,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const initialTheme = savedTheme || (prefersDark ? 'dark' : 'light');
     applyTheme(initialTheme);
 
-    // Initial data load and setup periodic refresh
+    setupEventListeners();
     fetchData(true);
     setInterval(() => fetchData(false), 30000);
 });
+
