@@ -600,7 +600,7 @@ body.dark-theme .theme-toggle-btn #theme-toggle-light-icon {
 .atividade-item-progress-bar {
     height: 22px; /* Thinner bar */
     width: 100%;
-    background-color: #6b7280;
+    background-color: #e5e7eb;
     border-radius: 4px; /* Sharper corners */
     margin-bottom: 1rem;
     position: relative;
@@ -687,6 +687,10 @@ body.dark-theme .atividade-item-square-top a:hover {
 
 body.dark-theme .atividade-item-square-bottom {
     color: #f9fafb;
+}
+
+body.dark-theme .atividade-item-progress-bar {
+    background-color: #6b7280;
 }
 
 /* --- Mobile Responsiveness --- */
