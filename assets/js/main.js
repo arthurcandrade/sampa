@@ -289,7 +289,7 @@ function renderAtividades() {
                 <div class="atividade-item-middle-right">
                     <div class="atividade-item-progress-bar">
                         <div class="atividade-item-progress ${progressClass}" style="width: ${percentage}%;">
-                            <span>${percentage}%</span>
+                            <span>${percentage >= 1 ? percentage + '%' : ''}</span>
                         </div>
                     </div>
                     <div class="atividade-item-fields">
@@ -303,7 +303,7 @@ function renderAtividades() {
                             <div>${previsaoConclusao}</div>
                         </div>
                         <div class="atividade-item-square-bottom">
-                            <div class="atividade-item-square-title">Integrantes</div>
+                            <div class="atividade-item-square-title">Integrantes Equipe Planejamento</div>
                             <div>${integrantes}</div>
                         </div>
                     </div>

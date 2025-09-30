@@ -512,25 +512,25 @@ body.dark-theme .theme-toggle-btn #theme-toggle-light-icon {
 }
 
 .atividade-item-left {
-    flex-basis: 10%;
+    flex-basis: 15%;
     padding: 1.5rem;
     border-right: 1px solid #f3f4f6;
 }
 
 .atividade-item-middle-left {
-    flex-basis: 30%;
+    flex-basis: 25%;
     padding: 1.5rem;
     border-right: 1px solid #f3f4f6;
 }
 
 .atividade-item-middle-right {
-    flex-basis: 50%;
+    flex-basis: 45%;
     padding: 1.5rem;
     border-right: 1px solid #f3f4f6;
 }
 
 .atividade-item-right {
-    flex-basis: 10%;
+    flex-basis: 15%;
     padding: 1.5rem;
 }
 
@@ -582,7 +582,7 @@ body.dark-theme .theme-toggle-btn #theme-toggle-light-icon {
 .atividade-item-square-title {
     font-size: 1rem;
     font-weight: 500;
-    color: #6b7280;
+    color: #6c757d;
     margin-bottom: 0.5rem;
 }
 
@@ -598,9 +598,9 @@ body.dark-theme .theme-toggle-btn #theme-toggle-light-icon {
 }
 
 .atividade-item-progress-bar {
-    height: 20px; /* Thinner bar */
+    height: 22px; /* Thinner bar */
     width: 100%;
-    background-color: #e5e7eb;
+    background-color: #6b7280;
     border-radius: 4px; /* Sharper corners */
     margin-bottom: 1rem;
     position: relative;
@@ -646,7 +646,7 @@ body.dark-theme .theme-toggle-btn #theme-toggle-light-icon {
     width: 100%;
     text-align: center;
     color: white;
-    font-size: 0.9rem;
+    font-size: 1.4rem;
 }
 
 .atividade-item-fields {
@@ -656,7 +656,7 @@ body.dark-theme .theme-toggle-btn #theme-toggle-light-icon {
 body.dark-theme .atividades-item {
     background-color: #1f2937;
     border-color: #374151;
-    color: #f9fafb;
+    color: #d1d5db;
 }
 
 body.dark-theme .atividade-item-left,
@@ -667,6 +667,10 @@ body.dark-theme .atividade-item-middle-right {
 
 body.dark-theme .atividade-item-square-title {
     color: #9ca3af;
+}
+
+body.dark-theme .atividade-item-summary {
+    color: #f9fafb;
 }
 
 body.dark-theme .atividade-item-demanda {
@@ -774,7 +778,7 @@ body.dark-theme .atividade-item-square-bottom {
 
 .status-items-container {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
     gap: 0.5rem;
     margin-top: 1rem;
 }
@@ -782,19 +786,24 @@ body.dark-theme .atividade-item-square-bottom {
 .status-group {
     display: flex;
     align-items: center;
-    gap: 0.25rem;
-    flex-basis: 100%;
+    gap: 0.5rem;
 }
 
 .status-group-label {
+    width: 180px;
+    flex-shrink: 0;
     font-weight: 500;
-    margin-right: 0.5rem;
     font-size: 0.9rem;
-    min-width: 140px;
+}
+
+.status-items-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
 }
 
 .status-item {
-    width: 40px;
+    width: 45px;
     height: 20px;
     border-radius: 3px;
     color: white;
