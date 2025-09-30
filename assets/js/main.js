@@ -57,10 +57,7 @@ async function fetchData(isInitialLoad = false) {
         if (cachedData !== dataString) {
             localStorage.setItem('kanbanData', dataString);
             renderBoard(data);
-            // If atividades view is active, re-render it with new data
-            if (document.getElementById('atividades-view').classList.contains('active')) {
-                renderAtividades();
-            }
+            renderAtividades();
         }
     } catch (error) {
         console.error('Error fetching data:', error);
@@ -228,6 +225,7 @@ function renderAtividades() {
             const percentage = 50; // Placeholder
 
             const previsaoConclusao = item["Data Prevista Contratação"];
+            const integrantes = item["SAMPA - Integrantes"];
 
 
             itemEl.innerHTML = `
@@ -254,7 +252,7 @@ function renderAtividades() {
                         </div>
                     </div>
                     <div class="atividade-item-fields">
-                        <div>Oficialização de Demanda: ${od}</div>
+                        <hr><div>Oficialização de Demanda: ${od}</div>
                         <div>Estudo Técnico Preliminar: ${etp}</div>
                         <div>Mapa de Riscos: ${ar}</div>
                         <div>Termo de Referência: ${tr}</div>
@@ -269,7 +267,7 @@ function renderAtividades() {
                         </div>
                         <div class="atividade-item-square-bottom">
                             <div class="atividade-item-square-title">Integrantes</div>
-                            <div>TBD</div>
+                            <div>${integrantes}</div>
                         </div>
                     </div>
                 </div>

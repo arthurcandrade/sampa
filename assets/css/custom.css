@@ -150,7 +150,7 @@ html, body {
 .kanban-card {
     background-color: #ffffff;
     border: 1px solid #e5e7eb;
-    border-radius: 0.5rem;
+    border-radius: 4px;
     box-shadow: 0 2px 0 0 #e5e7eb, 0 3px 5px rgba(0,0,0,0.07);
     margin-bottom: 0.5rem;
     display: flex;
@@ -500,7 +500,7 @@ body.dark-theme .theme-toggle-btn #theme-toggle-light-icon {
     align-items: stretch;
     background-color: #ffffff;
     border: 1px solid #e5e7eb;
-    border-radius: 0.75rem; /* Softer corners */
+    border-radius: 4px; /* Softer corners */
     margin-bottom: 1.5rem; /* More space between items */
     padding: 0;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* Soft shadow */
@@ -573,18 +573,18 @@ body.dark-theme .theme-toggle-btn #theme-toggle-light-icon {
     justify-content: center;
     padding: 0.5rem;
     text-align: center;
-    font-size: 1rem;
+    font-size: 1.2rem;
 }
 
 .atividade-item-square-title {
-    font-size: 0.8rem;
+    font-size: 1rem;
     font-weight: 500;
     color: #6b7280;
     margin-bottom: 0.5rem;
 }
 
 .atividade-item-summary {
-    font-size: 1.1rem;
+    font-size: 1.4rem;
     font-weight: 600;
     margin-bottom: 0.75rem;
 }
@@ -598,7 +598,7 @@ body.dark-theme .theme-toggle-btn #theme-toggle-light-icon {
     height: 20px; /* Thinner bar */
     width: 100%;
     background-color: #e5e7eb;
-    border-radius: 8px; /* Sharper corners */
+    border-radius: 4px; /* Sharper corners */
     margin-bottom: 1rem;
     position: relative;
     overflow: hidden;
@@ -607,7 +607,7 @@ body.dark-theme .theme-toggle-btn #theme-toggle-light-icon {
 .atividade-item-progress {
     height: 100%;
     background-color: #10b981;
-    border-radius: 8px;
+    border-radius: 4px;
     display: flex;
     align-items: center;
     justify-content: center;
