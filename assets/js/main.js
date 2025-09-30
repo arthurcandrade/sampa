@@ -57,9 +57,9 @@ async function fetchData(isInitialLoad = false) {
         if (cachedData !== dataString) {
             localStorage.setItem('kanbanData', dataString);
             renderBoard(data);
-            // If andamentos view is active, re-render it with new data
-            if (document.getElementById('andamentos-view').classList.contains('active')) {
-                renderAndamentos();
+            // If atividades view is active, re-render it with new data
+            if (document.getElementById('atividades-view').classList.contains('active')) {
+                renderAtividades();
             }
         }
     } catch (error) {
@@ -80,7 +80,7 @@ function formatProcesso(processo) {
 function formatDate(dateString) {
     if (!dateString) return '';
     const date = new Date(dateString);
-    if (isNaN(date)) return dateString; 
+    if (isNaN(date)) return dateString;
     const day = String(date.getDate()).padStart(2, '0');
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const year = date.getFullYear();
@@ -191,14 +191,14 @@ function renderBoard(data) {
     kanbanBoard.appendChild(fragment);
 }
 
-function renderAndamentos() {
-    const andamentosList = document.getElementById('andamentos-list');
+function renderAtividades() {
+    const atividadesList = document.getElementById('atividades-list');
     const fragment = document.createDocumentFragment();
 
     if (Array.isArray(allData)) {
         allData.forEach(item => {
             const itemEl = document.createElement('div');
-            itemEl.className = 'andamentos-item';
+            itemEl.className = 'atividades-item';
 
             const processoOriginal = item["Processo Administrativo"];
             let sanitizedParts = [];
@@ -227,30 +227,33 @@ function renderAndamentos() {
 
             const percentage = 50; // Placeholder
 
+            const previsaoConclusao = item["Data Prevista Contratação"];
+
+
             itemEl.innerHTML = `
-                <div class="andamento-item-left">
-                    <div class="andamento-item-square">
-                        <div class="andamento-item-square-top">
-                            <div class="andamento-item-square-title">Processo Proad</div>
+                <div class="atividade-item-left">
+                    <div class="atividade-item-square">
+                        <div class="atividade-item-square-top">
+                            <div class="atividade-item-square-title">Processo Proad</div>
                             ${processoLinksHtml}
                         </div>
-                        <div class="andamento-item-square-bottom">
-                            <div class="andamento-item-square-title">ID - PCA</div>
+                        <div class="atividade-item-square-bottom">
+                            <div class="atividade-item-square-title">ID - PCA</div>
                             ${itemPlanoContratacoes}
                         </div>
                     </div>
                 </div>
-                <div class="andamento-item-middle-left">
-                    <div class="andamento-item-summary">${displaySummary}</div>
-                    <div class="andamento-item-demanda">${demanda}</div>
+                <div class="atividade-item-middle-left">
+                    <div class="atividade-item-summary">${displaySummary}</div>
+                    <div class="atividade-item-demanda">${demanda}</div>
                 </div>
-                <div class="andamento-item-middle-right">
-                    <div class="andamento-item-progress-bar">
-                        <div class="andamento-item-progress" style="width: ${percentage}%;">
+                <div class="atividade-item-middle-right">
+                    <div class="atividade-item-progress-bar">
+                        <div class="atividade-item-progress" style="width: ${percentage}%;">
                             <span>${percentage}%</span>
                         </div>
                     </div>
-                    <div class="andamento-item-fields">
+                    <div class="atividade-item-fields">
                         <div>Oficialização de Demanda: ${od}</div>
                         <div>Estudo Técnico Preliminar: ${etp}</div>
                         <div>Mapa de Riscos: ${ar}</div>
@@ -258,14 +261,14 @@ function renderAndamentos() {
                         <div>Análise de Mercado: ${am}</div>
                     </div>
                 </div>
-                <div class="andamento-item-right">
-                    <div class="andamento-item-square">
-                        <div class="andamento-item-square-top">
-                            <div class="andamento-item-square-title">Previsão / Conclusão</div>
-                            <div>TBD</div>
+                <div class="atividade-item-right">
+                    <div class="atividade-item-square">
+                        <div class="atividade-item-square-top">
+                            <div class="atividade-item-square-title">Previsão / Conclusão</div>
+                            <div>${previsaoConclusao}</div>
                         </div>
-                        <div class="andamento-item-square-bottom">
-                            <div class="andamento-item-square-title">Integrantes</div>
+                        <div class="atividade-item-square-bottom">
+                            <div class="atividade-item-square-title">Integrantes</div>
                             <div>TBD</div>
                         </div>
                     </div>
@@ -275,37 +278,37 @@ function renderAndamentos() {
         });
     }
 
-    andamentosList.innerHTML = '';
-    andamentosList.appendChild(fragment);
+    atividadesList.innerHTML = '';
+    atividadesList.appendChild(fragment);
 }
 
 function setupEventListeners() {
-    const atividadesView = document.getElementById('atividades-view');
     const andamentosView = document.getElementById('andamentos-view');
-    const atividadesTab = document.getElementById('atividades-tab');
+    const atividadesView = document.getElementById('atividades-view');
     const andamentosTab = document.getElementById('andamentos-tab');
-
-    atividadesTab.addEventListener('click', () => {
-        atividadesView.style.display = 'flex';
-        andamentosView.style.display = 'none';
-        atividadesTab.classList.add('active');
-        andamentosTab.classList.remove('active');
-    });
+    const atividadesTab = document.getElementById('atividades-tab');
 
     andamentosTab.addEventListener('click', () => {
-        atividadesView.style.display = 'none';
         andamentosView.style.display = 'flex';
+        atividadesView.style.display = 'none';
         andamentosTab.classList.add('active');
         atividadesTab.classList.remove('active');
-        renderAndamentos(); // Render the list when tab is clicked
+    });
+
+    atividadesTab.addEventListener('click', () => {
+        andamentosView.style.display = 'none';
+        atividadesView.style.display = 'flex';
+        atividadesTab.classList.add('active');
+        andamentosTab.classList.remove('active');
+        renderAtividades(); // Render the list when tab is clicked
     });
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    const atividadesView = document.getElementById('atividades-view');
     const andamentosView = document.getElementById('andamentos-view');
-    atividadesView.style.display = 'flex';
-    andamentosView.style.display = 'none';
+    const atividadesView = document.getElementById('atividades-view');
+    andamentosView.style.display = 'flex';
+    atividadesView.style.display = 'none';
 
     const themeToggleButton = document.getElementById('theme-toggle');
     const body = document.body;
