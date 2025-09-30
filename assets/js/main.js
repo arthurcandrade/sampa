@@ -188,6 +188,51 @@ function renderBoard(data) {
     kanbanBoard.appendChild(fragment);
 }
 
+const statusConfig = {
+    "SAMPA - OD": { prefix: 'OD', total: 3, label: 'Oficialização de Demanda' },
+    "SAMPA - ETP": { prefix: 'ETP', total: 13, label: 'Estudo Técnico Preliminar' },
+    "SAMPA - AR": { prefix: 'AR', total: 5, label: 'Mapa de Riscos' },
+    "SAMPA - TR": { prefix: 'TR', total: 2, label: 'Termo de Referência' },
+    "SAMPA - AM": { prefix: 'AM', total: 3, label: 'Análise de Mercado' }
+};
+
+function calculateProgress(item) {
+    let attendedCount = 0;
+    let totalCount = 0;
+
+    for (const key in statusConfig) {
+        const config = statusConfig[key];
+        totalCount += config.total;
+        const value = item[key] || '';
+        const match = value.match(/\d+$/);
+        if (match) {
+            attendedCount += parseInt(match[0], 10);
+        }
+    }
+
+    if (totalCount === 0) return 0;
+    return Math.round((attendedCount / totalCount) * 100);
+}
+
+function createStatusItems(item) {
+    let html = '<div class="status-items-container">';
+    for (const key in statusConfig) {
+        const config = statusConfig[key];
+        const value = item[key] || '';
+        const match = value.match(/\d+$/);
+        const attendedLevel = match ? parseInt(match[0], 10) : 0;
+
+        html += `<div class="status-group"><span class="status-group-label">${config.label}:</span>`;
+        for (let i = 1; i <= config.total; i++) {
+            const statusClass = i <= attendedLevel ? 'attended' : 'unattended';
+            html += `<div class="status-item ${statusClass}" title="${config.prefix}${i}">${config.prefix}${i}</div>`;
+        }
+        html += '</div>';
+    }
+    html += '</div>';
+    return html;
+}
+
 function renderAtividades() {
     const atividadesList = document.getElementById('atividades-list');
     const fragment = document.createDocumentFragment();
@@ -216,17 +261,13 @@ function renderAtividades() {
             const displaySummary = parts.length > 1 ? parts.slice(1).join(' - ') : summary;
             const demanda = item["Demanda"] || '';
 
-            const od = item["SAMPA - OD"] || '';
-            const etp = item["SAMPA - ETP"] || '';
-            const ar = item["SAMPA - AR"] || '';
-            const tr = item["SAMPA - TR"] || '';
-            const am = item["SAMPA - AM"] || '';
+            const percentage = calculateProgress(item);
+            const statusItemsHtml = createStatusItems(item);
 
-            const percentage = 50; // Placeholder
+            const progressClass = percentage === 100 ? 'completed' : '';
 
             const previsaoConclusao = item["Data Prevista Contratação"];
             const integrantes = item["SAMPA - Integrantes"];
-
 
             itemEl.innerHTML = `
                 <div class="atividade-item-left">
@@ -247,16 +288,12 @@ function renderAtividades() {
                 </div>
                 <div class="atividade-item-middle-right">
                     <div class="atividade-item-progress-bar">
-                        <div class="atividade-item-progress" style="width: ${percentage}%;">
+                        <div class="atividade-item-progress ${progressClass}" style="width: ${percentage}%;">
                             <span>${percentage}%</span>
                         </div>
                     </div>
                     <div class="atividade-item-fields">
-                        <hr><div>Oficialização de Demanda: ${od}</div>
-                        <div>Estudo Técnico Preliminar: ${etp}</div>
-                        <div>Mapa de Riscos: ${ar}</div>
-                        <div>Termo de Referência: ${tr}</div>
-                        <div>Análise de Mercado: ${am}</div>
+                        ${statusItemsHtml}
                     </div>
                 </div>
                 <div class="atividade-item-right">
