@@ -191,7 +191,7 @@ function renderBoard(data) {
 const statusConfig = {
     "SAMPA - OD": { prefix: 'OD', total: 3, label: 'Oficialização de Demanda' },
     "SAMPA - ETP": { prefix: 'ETP', total: 13, label: 'Estudo Técnico Preliminar' },
-    "SAMPA - AR": { prefix: 'AR', total: 5, label: 'Mapa de Riscos' },
+    "SAMPA - AR": { prefix: 'AR', total: 7, label: 'Mapa de Riscos' },
     "SAMPA - TR": { prefix: 'TR', total: 2, label: 'Termo de Referência' },
     "SAMPA - AM": { prefix: 'AM', total: 3, label: 'Análise de Mercado' }
 };
@@ -266,7 +266,7 @@ function renderAtividades() {
 
             const progressClass = percentage === 100 ? 'completed' : '';
 
-            const previsaoConclusao = item["Data Prevista Contratação"];
+            const previsaoConclusao = item["Data Prevista"];
             const integrantes = item["SAMPA - Integrantes"];
 
             itemEl.innerHTML = `
