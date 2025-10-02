@@ -699,65 +699,96 @@ body.dark-theme .atividade-item-progress-bar {
 
 /* --- Mobile Responsiveness --- */
 
-@media (max-width: 768px) {
+@media (max-width: 1210px) {
+    /* GENERAL LAYOUT: Make footer sticky and content scrollable */
     html, body {
-        overflow: auto; /* Re-enable scrolling on mobile for usability */
-        height: auto;
+        height: 100%;
+        overflow: hidden;
     }
     .page-container {
-        height: auto;
-        min-height: 100vh;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+    #andamentos-view, #atividades-view {
+        flex-grow: 1;
+        overflow-y: auto; /* Allow vertical scroll for content */
+    }
+    .site-footer {
+        position: static; /* Ensure footer is part of the flex flow */
+        width: 100%;
     }
 
+    .site-footer a.github-link {
+        display: none;
+    }
+
+    /* PAGE TITLE: Reduce size on mobile */
     .title-container h1 {
-        font-size: 2.2rem;
+        font-size: 1rem;
     }
-
     .title-container h2 {
-        font-size: 1.2rem;
+        font-size: 1rem;
         padding: 0 1rem;
     }
 
+    /* ANDAMENTOS VIEW: Restore horizontal scrolling and center columns */
     .kanban-board {
-        padding: 0.25rem;
-        gap: 0.25rem;
-        overflow-x: auto; /* Keep scrolling on mobile */
-        scroll-snap-type: x mandatory;
+        display: flex;
         flex-direction: row;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        align-items: stretch;
     }
-
     .kanban-board::after {
-        display: none; /* Hide line on mobile */
+        display: none;
     }
-
     .kanban-column {
-        flex: 0 0 80%; /* Make columns take up more horizontal space on mobile */
+        flex: 0 0 100%;
         scroll-snap-align: center;
     }
-
-    .kanban-card-header strong {
-        font-size: 1rem;
+    .kanban-cards-container {
+        flex-direction: column;
+        order: 2;
     }
-
-    .kanban-card-body {
-        font-size: 0.9rem;
-    }
-
-    .theme-switcher-container {
-        top: 0.75rem;
-        right: 0.75rem;
-    }
-
-    .detail-item {
-        font-size: 0.8rem
-    }
-
     .kanban-column h2 {
         order: 1;
     }
 
-    .kanban-cards-container {
-        order: 2;
+
+    /* ATIVIDADES VIEW: Force wide layout and reduce font/padding */
+    .atividades-list {
+        overflow-x: auto;
+        padding: 1rem;
+    }
+    .atividades-item {
+        width: 1920px;
+    }
+    .atividade-item-left,
+    .atividade-item-middle-left,
+    .atividade-item-middle-right,
+    .atividade-item-right {
+        padding: 1rem; /* Reduce padding */
+    }
+    .atividade-item-summary,
+    .atividade-item-square-top,
+    .atividade-item-square-bottom {
+        font-size: 1.1rem; /* Reduce large font sizes */
+    }
+
+    /* MISC STYLES */
+    .kanban-card-header strong {
+        font-size: 1rem;
+    }
+    .kanban-card-body {
+        font-size: 0.9rem;
+    }
+    .theme-switcher-container {
+        top: 0.75rem;
+        right: 0.75rem;
+    }
+    .detail-item {
+        font-size: 0.8rem;
     }
 }
 
