@@ -703,10 +703,10 @@ body.dark-theme .atividade-item-progress-bar {
     /* GENERAL LAYOUT: Make footer sticky and content scrollable */
     html, body {
         height: 100%;
-        overflow: hidden;
+        overflow: auto; /* Allow scrolling on mobile */
     }
     .page-container {
-        height: 100vh;
+        min-height: 100vh;
         display: flex;
         flex-direction: column;
     }
@@ -715,8 +715,14 @@ body.dark-theme .atividade-item-progress-bar {
         overflow-y: auto; /* Allow vertical scroll for content */
     }
     .site-footer {
-        position: static; /* Ensure footer is part of the flex flow */
+        position: relative; /* Ensure footer is visible and part of flow */
         width: 100%;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 10;
+        flex-shrink: 0;
+        display: flex;
     }
 
     .site-footer a.github-link {
@@ -754,7 +760,6 @@ body.dark-theme .atividade-item-progress-bar {
     .kanban-column h2 {
         order: 1;
     }
-
 
     /* ATIVIDADES VIEW: Force wide layout and reduce font/padding */
     .atividades-list {
